@@ -49,6 +49,8 @@ class PipePair:
         """Рисует верхнюю и нижнюю трубы."""
         pygame.draw.rect(screen, PIPE_COLOR, self.top_rect)
         pygame.draw.rect(screen, PIPE_COLOR, self.bottom_rect)
+
+
 class PipeManager:
     """Управляет появлением труб и подсчётом очков."""
 
