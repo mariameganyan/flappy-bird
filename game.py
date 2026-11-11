@@ -1,14 +1,16 @@
 """Окно и основной цикл игры."""
 
 import pygame
-from bird import Bird
 
+from bird import Bird
+from pipes import PipeManager
 from settings import (
     BACKGROUND_COLOR,
     FONT_SIZE,
     FPS,
     HEIGHT,
     MESSAGE_LINE_SPACING,
+    SCORE_MARGIN,
     TEXT_COLOR,
     WIDTH,
 )
@@ -18,13 +20,14 @@ class Game:
     """Управляет окном и игровым циклом."""
 
     def __init__(self):
-        """Создаёт окно и часы для ограничения частоты кадров."""
+        """Создаёт окно и начальные объекты игры."""
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Flappy Bird")
         self.clock = pygame.time.Clock()
         self.running = True
         self.bird = Bird()
+        self.pipes = PipeManager()
         self.game_over = False
         self.font = pygame.font.Font(None, FONT_SIZE)
 
@@ -60,16 +63,29 @@ class Game:
                     elif event.key == pygame.K_r:
                         if self.game_over:
                             self.bird = Bird()
+                            self.pipes = PipeManager()
                             self.game_over = False
 
             if not self.game_over:
                 self.bird.update(dt)
+                self.pipes.update(dt, self.bird.rect.left)
 
-                if self.bird.hits_boundary():
+                if (
+                    self.bird.hits_boundary()
+                    or self.bird.hits_pipes(self.pipes.get_rects())
+                ):
                     self.game_over = True
 
             self.screen.fill(BACKGROUND_COLOR)
+            self.pipes.draw(self.screen)
             self.bird.draw(self.screen)
+
+            score_text = self.font.render(
+                f"Очки: {self.pipes.score}", True, TEXT_COLOR
+            )
+            self.screen.blit(
+                score_text, (SCORE_MARGIN, SCORE_MARGIN)
+            )
 
             if self.game_over:
                 self.draw_game_over()

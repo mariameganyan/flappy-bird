@@ -41,3 +41,7 @@ class Bird:
     def draw(self, screen):
         """Рисует птицу в виде жёлтого овала."""
         pygame.draw.ellipse(screen, BIRD_COLOR, self.rect)
+
+    def hits_pipes(self, pipe_rects):
+        """Проверяет столкновение птицы с трубами."""
+        return self.rect.collidelist(pipe_rects) != -1
